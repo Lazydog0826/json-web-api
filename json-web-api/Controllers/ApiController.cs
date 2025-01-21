@@ -10,16 +10,17 @@ namespace json_web_api.Controllers
         [HttpPost("AddJson")]
         public IActionResult AddJsonAsync([FromBody] AddJsonRequest param)
         {
-            var guid = YitIdHelper.NextId();
-            _memoryCache.Set(guid.ToString(), param, TimeSpan.FromHours(param.Hour));
-            return Ok(new { Key = guid });
+            var key = YitIdHelper.NextId().ToString();
+            param.Key = key;
+            _memoryCache.Set(key, param, TimeSpan.FromHours(param.Hour));
+            return Ok(new { Key = key });
         }
 
         [HttpGet("GetJson")]
         public IActionResult GetJsonAsync([FromQuery] string key)
         {
             var res = _memoryCache.Get<AddJsonRequest>(key);
-            return Ok(res);
+            return Ok(res ?? new AddJsonRequest());
         }
     }
 }
