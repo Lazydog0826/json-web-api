@@ -14,6 +14,7 @@ namespace json_web_api.Controllers
             param.Key = key;
             memoryCache.Set(key, param, TimeSpan.FromHours(param.Hour));
             return Ok(new { Key = key });
+            ;
         }
 
         [HttpGet("GetJson")]
