@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 YitIdHelper.SetIdGenerator(new IdGeneratorOptions(0));
 
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddMemoryCache();
 
@@ -33,6 +34,7 @@ if (builder.Environment.IsDevelopment())
 
 // Configure the HTTP request pipeline.
 
+app.MapHealthChecks("health");
 app.UseAuthorization();
 app.MapControllers();
 
