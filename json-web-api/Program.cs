@@ -1,3 +1,4 @@
+using StackExchange.Redis;
 using Yitter.IdGenerator;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,12 @@ YitIdHelper.SetIdGenerator(new IdGeneratorOptions(0));
 
 builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
-builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ConnectionMultiplexer>(_ =>
+    ConnectionMultiplexer.Connect(
+        builder.Configuration.GetSection("Redis").Get<string>()
+            ?? throw new Exception("缺少Redis配置")
+    )
+);
 
 if (builder.Environment.IsDevelopment())
 {
@@ -17,7 +23,7 @@ if (builder.Environment.IsDevelopment())
         opt.AddDefaultPolicy(policy =>
         {
             policy
-                .SetIsOriginAllowed((string _) => true)
+                .SetIsOriginAllowed(_ => true)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
@@ -31,8 +37,6 @@ if (builder.Environment.IsDevelopment())
 {
     app.UseCors();
 }
-
-// Configure the HTTP request pipeline.
 
 app.MapHealthChecks("health");
 app.UseAuthorization();
