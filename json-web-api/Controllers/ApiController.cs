@@ -27,6 +27,10 @@ public class ApiController(ConnectionMultiplexer connectionMultiplexer) : Contro
     {
         var db = connectionMultiplexer.GetDatabase(15);
         var res = await db.StringGetAsync(key);
-        return Ok(JsonConvert.DeserializeObject<AddJsonRequest>(res.ToString()));
+        return Ok(
+            !string.IsNullOrWhiteSpace(res)
+                ? new AddJsonRequest()
+                : JsonConvert.DeserializeObject<AddJsonRequest>(res!)
+        );
     }
 }
